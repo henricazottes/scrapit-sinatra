@@ -1,0 +1,125 @@
+%form{id: 'scrap-form', method: 'POST', action: '/scraps'}
+  %label.label
+    %h2.title.is-4 Settings
+  .field.is-horizontal
+    .field-label.is-normal
+      %label.label Name
+    .field-body
+      .field.has-addons
+        .control.is-expanded
+          %input.input{type: 'text', placeholder: 'name', name: 'name', value: locals[:name], readonly: true}
+        .control
+          %a.button.is-primary.tooltip{'data-tooltip': "Upgrade to pro", disabled: true}
+            %i{class: "fas fa-pen"}
+  .field.is-horizontal
+    .field-label.is-normal
+      %label.label Global target URL
+    .field-body
+      .field
+        .control.is-expanded
+          %input.input{id: "global-target-url", type: 'text', placeholder: 'url', name: 'url'}
+  %label.label
+    %h2.title.is-4 Selectors
+  = haml :'/forms/_selector_field', locals: {id: "selector-0", add: true}
+  
+  .field.is-horizontal
+    .field-label.is-normal
+      %label.label
+    .field-body
+      %a.button.is-primary{id: "save-scrap", href: "#"} Save
+
+
+:javascript
+  index = 1;
+
+  function createElementFromHTML(htmlString) {
+    var div = document.createElement('div')
+    div.innerHTML = htmlString.trim()
+    return div.firstChild;
+  }
+
+  function attachDelEvents(){
+    [...document.querySelectorAll('.field .del')].map(el => {
+      el.addEventListener('click', function() {
+        target_id = "selector-" + el.getAttribute("data-target");
+        document.getElementById(target_id).remove();
+      })
+    });
+  }
+
+  function attachUpdateEvent() {
+    document.getElementById("update-response").addEventListener("click", updateResponse)
+  }
+
+  async function updateResponse() {
+    target_url      = document.getElementById("global-target-url").value
+    scrap_names     = [...document.querySelectorAll('.scrap-name')].map(el => el.value )
+    scrap_selectors = [...document.querySelectorAll('.scrap-selector')].map(el => el.value )
+    scrap_urls      = [...document.querySelectorAll('.scrap-url')].map(el => el.value )
+
+    scrap_names.shift()
+    scrap_selectors.shift()
+    scrap_urls.shift()
+    query = scrap_names.map((name, index) => {
+      try {
+        return [name, scrap_selectors[index], scrap_urls[index]]
+      } catch {
+        console.log("Missing selector")
+        return {name: ""}
+      }
+    })
+    encoded_query = encodeURIComponent(JSON.stringify(query))
+    api_url = "http://localhost:4567/api?scraps=" + encoded_query
+    if (window.fetch) {
+      response  = await window.fetch(api_url)
+      json      = await response.json()
+      document.getElementById("response-json").innerHTML = JSON.stringify(json, null, 2)
+      document.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightBlock(block);
+      });
+    } else {
+        console.log("Fetch unavalaible.")
+    }
+  }
+
+  window.onload = function() {
+    attachUpdateEvent()
+
+    document.getElementById("add-selector").addEventListener("click", function(){
+      index++;
+      selectors = document.querySelectorAll('.field.selector');
+      last_selector = selectors[selectors.length -1];
+      new_scrap = createElementFromHTML(`#{haml :'forms/_selector_field', locals: {id: "", add: false}}`)
+      new_scrap.setAttribute("id", "selector-" + index)
+      document.getElementById("scrap-form").insertBefore(new_scrap, last_selector.nextSibling);
+      document.querySelector(`div#selector-${index} a.del`).setAttribute("data-target", index)
+      attachDelEvents()
+
+      new_name_input            = document.querySelector(`div#selector-${index} .scrap-name`)
+      name_input                = document.querySelector('div#selector-0 .scrap-name')
+      new_name_input.value      = name_input.value
+      name_input.value          = ""
+      
+      new_selector_input        = document.querySelector(`div#selector-${index} .scrap-selector`)
+      selector_input            = document.querySelector('div#selector-0 .scrap-selector')
+      new_selector_input.value  = selector_input.value
+      selector_input.value      = ""
+      
+      global_url_input          = document.getElementById("global-target-url")
+      new_url_input             = document.querySelector(`div#selector-${index} .scrap-url`)
+      url_input                 = document.querySelector('div#selector-0 .scrap-url')
+
+      if (url_input.value != "") {
+        new_url_input.value = url_input.value
+      } else {
+        new_url_input.value = global_url_input.value
+      }
+
+      url_input.value = ""
+      
+    });
+
+    document.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightBlock(block);
+    });
+  }

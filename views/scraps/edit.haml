@@ -1,0 +1,34 @@
+%h1.title My scraps > New
+
+= haml :'forms/scrap', locals: {name: locals[:name]}
+
+%br
+%br
+.is-divider{"data-content": "PREVIEW"}
+%br
+%label.label
+  %h2.title.is-4 API
+.field.is-horizontal
+  .field-label.is-normal
+    %label.label GET
+  .field-body
+    .field.has-addons
+      .control.is-expanded
+        %input.input{type: 'text', name: 'url', placeholder: 'URL', value: "https://api.scrapit.io/" + locals[:name], readonly: true}
+      .control
+        %a.button.copy
+          %i{class: "far fa-copy"}
+        
+.field.is-horizontal  
+  .field-label.is-normal
+    %label.label Response
+  .field-body
+    .field.has-addons
+      .control.is-expanded
+        %pre{style: "padding: 0"}
+          %code{id: "response-json", class: 'json'}
+            = JSON.pretty_generate({})
+      .control
+        %a.button{id: "update-response",style: "position: relative; float: right"}
+          %i{class: "fas fa-sync"}
+  

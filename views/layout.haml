@@ -1,0 +1,19 @@
+!!!
+%html
+  %head
+    %title Scraping.io
+    %meta{charset: 'utf-8'}
+    %meta{name: 'viewport', content: 'width=device-width, initial-scale=1'}
+    %link{rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css'}
+    %script{defer: true, src: 'https://use.fontawesome.com/releases/v5.3.1/js/all.js'}
+    %link{rel: 'stylesheet', href: '/style/default.min.css'}
+    %link{rel: 'stylesheet', href: '/style/divider.min.css'}
+    %link{rel: 'stylesheet', href: '/style/tooltip.min.css'}
+    %script{src: '/js/highlight.min.js'}
+    %script{defer: "true", src: "https://use.fontawesome.com/releases/v5.3.1/js/all.js"}
+    :javascript
+      hljs.initHighlightingOnLoad()
+  %body
+    %section{class: 'section'}
+      .container
+        = yield

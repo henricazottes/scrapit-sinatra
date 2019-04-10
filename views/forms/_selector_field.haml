@@ -1,0 +1,18 @@
+.field.is-horizontal.selector{id: id}
+  .field-label.is-normal
+    %label.label 
+  .field-body
+    .field.has-addons
+      .control
+        %input.input.scrap-name{type: 'text', placeholder: 'name', name: "scrap-name"}
+      .control.is-expanded
+        %input.input.scrap-selector{type: 'text', placeholder: 'selector', name: "scrap-selector"}
+      .control.is-expanded
+        %input.input.scrap-url{type: 'text', placeholder: "url", name: "scrap-url", readonly: false}
+      .control
+        - if add
+          %a.button.is-primary{id: "add-selector", href: '#'}
+            %i{class: "fas fa-plus"}
+        - else
+          %a.button.is-danger.del{'data-target': id, href: '#'}
+            %i{class: "fas fa-trash-alt"}
